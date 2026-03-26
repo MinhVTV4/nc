@@ -7,22 +7,17 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     
-    <!-- Tích hợp Font Inter (Tiêu chuẩn quốc tế, hiển thị Tiếng Việt xuất sắc) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        /* Áp dụng Font Inter cho toàn bộ trang */
         body { font-family: 'Inter', sans-serif; }
-
-        /* Tùy chỉnh thanh cuộn tinh tế */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         
-        /* Typography cho khu vực đọc - Tối ưu khoảng cách dòng và kích cỡ */
         .reading-prose { font-size: 1.125rem; line-height: 1.85; color: #334155; }
         .reading-prose p { margin-bottom: 1.25rem; }
         .reading-prose h1, .reading-prose h2, .reading-prose h3 { color: #0f172a; font-weight: 800; margin-top: 2rem; margin-bottom: 1rem; line-height: 1.3; }
@@ -31,7 +26,6 @@
         .reading-prose ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1.25rem; }
         .reading-prose strong { color: #0f172a; font-weight: 700; }
         
-        /* Menu Nổi (Floating Tooltip) */
         #floatingMenu {
             position: absolute;
             z-index: 50;
@@ -42,103 +36,86 @@
             opacity: 0;
         }
         #floatingMenu.active { pointer-events: auto; opacity: 1; transform: translate(-50%, -100%) translateY(-5px); }
-        
-        /* Mũi tên chỉ xuống của Menu Nổi */
         .menu-arrow::after {
             content: ''; position: absolute; top: 100%; left: 50%;
             margin-left: -6px; border-width: 6px; border-style: solid;
             border-color: #1e293b transparent transparent transparent;
         }
-
-        /* ✨ Fix Menu trùng lặp Mobile: Đảo ngược vị trí nằm dưới */
-        #floatingMenu.mobile-pos {
-            transform: translate(-50%, 0);
-            margin-top: 0;
-        }
-        #floatingMenu.mobile-pos.active {
-            transform: translate(-50%, 0) translateY(5px);
-        }
-        #floatingMenu.mobile-pos::after {
-            top: auto; bottom: 100%;
-            border-color: transparent transparent #1e293b transparent;
-        }
-
-        /* Ngăn kéo kết quả (Inline Result Box) - Bỏ giới hạn chiều cao max-height */
-        .inline-result-box {
-            animation: slideDown 0.3s ease-out forwards;
-            transform-origin: top;
-        }
-        @keyframes slideDown {
-            from { opacity: 0; transform: scaleY(0.95); }
-            to { opacity: 1; transform: scaleY(1); }
-        }
         
-        /* Trạng thái Thu Gọn (Collapsed) */
-        .is-collapsed .box-content,
-        .is-collapsed .box-footer { display: none !important; }
+        #floatingMenu.mobile-pos { transform: translate(-50%, 0); margin-top: 0; }
+        #floatingMenu.mobile-pos.active { transform: translate(-50%, 0) translateY(5px); }
+        #floatingMenu.mobile-pos::after { top: auto; bottom: 100%; border-color: transparent transparent #1e293b transparent; }
+
+        .inline-result-box { transform-origin: top; animation: slideDown 0.3s ease-out forwards; }
+        @keyframes slideDown { from { opacity: 0; transform: scaleY(0.95); } to { opacity: 1; transform: scaleY(1); } }
+        
+        .is-collapsed .box-content, .is-collapsed .box-footer { display: none !important; }
         .is-collapsed { margin-bottom: 0.5rem !important; }
 
-        /* Modal Lịch sử */
-        #historyModal { backdrop-filter: blur(4px); }
-
-        /* ✨ CẬP NHẬT MỚI: Mở rộng lồng ghép (Nested) và Toàn màn hình (Full Screen) */
         .nested-result {
-            margin-left: 1rem;
-            margin-top: 0.5rem;
-            border-left: 3px solid #94a3b8 !important; /* Đường kẻ chỉ dẫn (Thread line) */
+            margin-left: 1rem; margin-top: 0.5rem;
+            border-left: 3px solid #94a3b8 !important; 
             border-radius: 0 1rem 1rem 0 !important;
             box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
         }
-        @media (min-width: 768px) {
-            .nested-result { margin-left: 2rem; border-left-width: 4px !important; }
-        }
+        @media (min-width: 768px) { .nested-result { margin-left: 2rem; border-left-width: 4px !important; } }
         
-        /* Fix CSS Stacking Context cho Fullscreen */
-        .stacking-disabled {
-            animation: none !important;
-            transform: none !important;
-        }
-
+        .stacking-disabled { animation: none !important; transform: none !important; }
         .fullscreen-mode {
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100vw !important;
-            height: 100vh !important;
-            z-index: 9999 !important;
-            margin: 0 !important;
-            border-radius: 0 !important;
-            overflow-y: auto !important;
-            max-height: none !important;
-            border: none !important;
-            background-color: #fff !important; /* Đảm bảo che kín nền */
-            animation: none !important; /* Tắt hiệu ứng để không tự nhốt mình */
-            transform: none !important;
+            position: fixed !important; top: 0 !important; left: 0 !important;
+            width: 100vw !important; height: 100vh !important;
+            z-index: 9999 !important; margin: 0 !important; border-radius: 0 !important;
+            overflow-y: auto !important; max-height: none !important; border: none !important;
+            background-color: #fff !important; animation: none !important; transform: none !important;
         }
-        /* Ngăn background cuộn khi đang ở chế độ toàn màn hình */
         body.has-fullscreen { overflow: hidden !important; }
+        #historyModal, #setupModal { backdrop-filter: blur(4px); }
+        
+        /* CSS cho Toggle Switch (Nút gạt) */
+        .toggle-checkbox:checked { right: 0; border-color: #2563EB; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #2563EB; }
     </style>
 </head>
 <body class="bg-[#f8fafc] min-h-screen flex flex-col relative selection:bg-blue-200 selection:text-blue-900">
 
-    <!-- Header -->
-    <header class="bg-white/80 backdrop-blur-md border-b border-slate-200 px-4 md:px-6 py-3 flex justify-between items-center sticky top-0 z-40 shadow-sm">
+    <header class="bg-white/80 backdrop-blur-md border-b border-slate-200 px-4 md:px-6 py-3 flex justify-between items-center sticky top-0 z-40 shadow-sm relative">
         <div>
             <h1 class="text-xl md:text-2xl font-extrabold text-blue-700 tracking-tight flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/></svg>
                 DeepRead AI
             </h1>
-            <p class="text-[10px] md:text-xs text-slate-500 font-medium mt-0.5" id="statusText">Đang khởi tạo...</p>
+            <p class="text-[10px] md:text-xs text-slate-500 font-medium mt-0.5" id="statusText">Đang chờ cấu hình AI...</p>
         </div>
-        <div class="flex items-center gap-2">
-            <!-- Nút Lịch sử mới -->
-            <button onclick="openHistoryModal()" class="px-3 py-1.5 md:px-4 md:py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2">
-                <span>📚</span>
-                <span class="hidden md:inline">Lịch sử</span>
+        <div class="flex items-center gap-1.5 md:gap-2">
+            <button id="loginBtn" class="p-2 md:px-3 md:py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2" title="Đăng nhập để Lưu trữ Đám mây">
+                <span>🔑</span><span class="hidden md:inline">Đăng nhập</span>
+            </button>
+            
+            <div id="userInfo" class="hidden flex items-center gap-2 bg-slate-100 p-1 pr-3 rounded-full cursor-pointer hover:bg-slate-200 transition" onclick="toggleLogoutMenu()">
+                <img id="userAvatar" src="" class="w-7 h-7 md:w-8 md:h-8 rounded-full border border-slate-200">
+                <span id="userName" class="text-xs font-semibold text-slate-700 hidden md:inline"></span>
+            </div>
+
+            <div id="logoutMenu" class="hidden absolute top-[60px] right-4 bg-white border border-slate-200 shadow-xl rounded-xl p-2 z-50 min-w-[150px]">
+                <div class="px-3 py-2 border-b border-slate-100 mb-1">
+                    <p class="text-xs text-slate-400">Đã đồng bộ Cloud</p>
+                </div>
+                <button id="logoutBtn" class="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg font-medium transition-colors flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                    Đăng xuất
+                </button>
+            </div>
+
+            <button onclick="openSetup()" class="p-2 md:px-3 md:py-2 bg-slate-50 hover:bg-slate-200 text-slate-600 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2 relative" title="Quản lý Kho Khóa AI (Ví Key)">
+                <span>⚙️</span>
+                <!-- Badge xanh báo hiệu đang dùng Cloud Key -->
+                <span id="cloudKeyBadge" class="hidden absolute top-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full"></span>
+            </button>
+            <button id="btnHistory" onclick="openHistoryModal()" class="hidden px-3 py-1.5 md:px-4 md:py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2 shadow-sm">
+                <span>☁️</span><span class="hidden md:inline">Lịch sử</span>
             </button>
             <button id="openChatBtn" class="hidden px-3 py-1.5 md:px-4 md:py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2 shadow-sm">
-                <span>💬</span>
-                <span class="hidden md:inline">Chat AI</span>
+                <span>💬</span><span class="hidden md:inline">Chat AI</span>
             </button>
             <button id="newReadBtn" class="hidden px-3 py-1.5 md:px-4 md:py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-sm font-semibold transition-colors flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
@@ -147,778 +124,659 @@
         </div>
     </header>
 
-    <!-- Màn hình 1: Nhập liệu ban đầu -->
-    <main id="inputScreen" class="flex-1 flex flex-col items-center justify-center p-4 md:p-6 w-full max-w-4xl mx-auto">
-        <div class="w-full bg-white p-6 md:p-8 rounded-2xl shadow-xl border border-slate-100">
-            <h2 class="text-lg md:text-xl font-bold mb-4 text-slate-800">Dán nội dung bài viết / tài liệu vào đây:</h2>
-            <textarea id="mainInput" class="w-full h-48 md:h-64 p-4 md:p-5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none text-slate-700 md:text-lg leading-relaxed shadow-inner placeholder-slate-400 font-sans" placeholder="Ví dụ: Copy một bài báo dài, một hợp đồng khó hiểu, hoặc một báo cáo khoa học..."></textarea>
+    <main id="inputScreen" class="hidden flex-1 flex flex-col items-center justify-center p-4 md:p-6 w-full max-w-4xl mx-auto">
+        <div class="w-full bg-white p-6 md:p-8 rounded-2xl shadow-xl border border-slate-100 relative">
+            <div id="cloudWarning" class="hidden absolute -top-4 left-1/2 transform -translate-x-1/2 bg-amber-100 text-amber-800 px-4 py-1.5 rounded-full text-xs font-bold shadow-sm border border-amber-200 flex items-center gap-1.5">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
+                Chế độ Ẩn danh: Lịch sử & Ví Khóa sẽ không lưu lên Cloud.
+            </div>
+
+            <h2 class="text-lg md:text-xl font-bold mb-4 text-slate-800 mt-2">Dán nội dung bài viết / tài liệu vào đây:</h2>
+            <textarea id="mainInput" class="w-full h-48 md:h-64 p-4 md:p-5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none text-slate-700 md:text-lg leading-relaxed shadow-inner placeholder-slate-400 font-sans" placeholder="Ví dụ: Copy một bài báo dài, một hợp đồng khó hiểu..."></textarea>
             <div class="mt-6 flex justify-end">
                 <button id="startBtn" class="w-full md:w-auto px-8 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:bg-slate-400">
-                    Bắt đầu Phân tích & Lưu trữ tự động
+                    Bắt đầu Phân tích
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
                 </button>
             </div>
         </div>
     </main>
 
-    <!-- Màn hình 2: Trạng thái Loading AI Formatting -->
     <main id="loadingScreen" class="hidden flex-1 flex flex-col items-center justify-center p-6 w-full text-center">
         <div class="w-16 h-16 border-4 border-slate-200 border-t-blue-600 rounded-full animate-spin mb-6"></div>
         <h2 class="text-2xl font-bold text-slate-800 mb-2">AI Đang Xử Lý & Dàn Trang...</h2>
-        <p class="text-slate-500 max-w-md">Giữ nguyên 100% nội dung gốc, tối ưu font chữ và chuẩn bị bộ nhớ lưu trữ.</p>
+        <p class="text-slate-500 max-w-md">Giữ nguyên 100% nội dung gốc, tối ưu font chữ và đồng bộ lên đám mây.</p>
     </main>
 
-    <!-- Màn hình 3: Không gian đọc (Reading Area) -->
     <main id="readingScreen" class="hidden flex-1 w-full bg-[#f8fafc] relative">
         <div class="max-w-3xl mx-auto bg-white min-h-screen px-6 py-10 md:px-12 md:py-16 shadow-sm border-x border-slate-200">
-            <!-- Tóm tắt toàn cục sẽ được chèn vào đây -->
             <div id="summaryArea" class="mb-10 pb-8 border-b-2 border-slate-100 hidden"></div>
-            
-            <!-- Nội dung bài đọc chính -->
-            <div id="contentArea" class="reading-prose">
-                <!-- Chữ format bằng Markdown sẽ hiện ở đây -->
-            </div>
-            
-            <div class="text-center mt-20 pt-10 border-t border-slate-100 text-slate-400 text-sm italic">
-                Tài liệu này đang được tự động lưu vào Lịch sử.
+            <div id="contentArea" class="reading-prose"></div>
+            <div class="text-center mt-20 pt-10 border-t border-slate-100 text-slate-400 text-sm italic flex items-center justify-center gap-2">
+                <span id="cloudStatusIcon">☁️</span> <span id="cloudStatusText">Tài liệu đã được đồng bộ lên Cloud.</span>
             </div>
         </div>
     </main>
 
-    <!-- Menu Nổi Thông Minh (Floating Action Button / Toolbar) -->
+    <!-- Menu Nổi và Khung Chat (Giữ nguyên) -->
     <div id="floatingMenu" class="bg-slate-800 text-white rounded-lg shadow-2xl flex p-1 menu-arrow ring-1 ring-white/10">
-        <button onclick="runTool('explain')" class="flex items-center gap-1.5 px-3 py-2 hover:bg-slate-700 rounded-md transition-colors text-sm font-medium border-r border-slate-600">
-            <span class="text-blue-400">🔍</span> Giải thích
-        </button>
-        <button onclick="runTool('eli5')" class="flex items-center gap-1.5 px-3 py-2 hover:bg-slate-700 rounded-md transition-colors text-sm font-medium border-r border-slate-600">
-            <span class="text-green-400">💡</span> Dễ hiểu
-        </button>
-        <button onclick="runTool('critique')" class="flex items-center gap-1.5 px-3 py-2 hover:bg-slate-700 rounded-md transition-colors text-sm font-medium border-r border-slate-600">
-            <span class="text-purple-400">⚖️</span> Phản biện
-        </button>
-        <button onclick="runTool('expand')" class="flex items-center gap-1.5 px-3 py-2 hover:bg-slate-700 rounded-md transition-colors text-sm font-medium">
-            <span class="text-orange-400">🌐</span> Mở rộng
-        </button>
-        <button onclick="quoteToChat()" class="flex items-center gap-1.5 px-3 py-2 hover:bg-slate-700 rounded-md transition-colors text-sm font-medium border-l border-slate-600 text-blue-300">
-            <span>💬</span> Hỏi AI
-        </button>
+        <button onclick="runTool('explain')" class="flex items-center gap-1.5 px-3 py-2 hover:bg-slate-700 rounded-md transition-colors text-sm font-medium border-r border-slate-600"><span class="text-blue-400">🔍</span> Giải thích</button>
+        <button onclick="runTool('eli5')" class="flex items-center gap-1.5 px-3 py-2 hover:bg-slate-700 rounded-md transition-colors text-sm font-medium border-r border-slate-600"><span class="text-green-400">💡</span> Dễ hiểu</button>
+        <button onclick="runTool('critique')" class="flex items-center gap-1.5 px-3 py-2 hover:bg-slate-700 rounded-md transition-colors text-sm font-medium border-r border-slate-600"><span class="text-purple-400">⚖️</span> Phản biện</button>
+        <button onclick="runTool('expand')" class="flex items-center gap-1.5 px-3 py-2 hover:bg-slate-700 rounded-md transition-colors text-sm font-medium"><span class="text-orange-400">🌐</span> Mở rộng</button>
+        <button onclick="quoteToChat()" class="flex items-center gap-1.5 px-3 py-2 hover:bg-slate-700 rounded-md transition-colors text-sm font-medium border-l border-slate-600 text-blue-300"><span>💬</span> Hỏi AI</button>
     </div>
 
-    <!-- Khung Chat Nổi (Right Drawer) -->
     <div id="chatDrawer" class="fixed inset-y-0 right-0 w-full md:w-[400px] bg-white shadow-2xl border-l border-slate-200 z-50 transform translate-x-full transition-transform duration-300 flex flex-col pt-16 md:pt-0">
         <div class="bg-blue-600 text-white p-4 flex justify-between items-center shrink-0 shadow-md z-10">
-            <h3 class="font-bold flex items-center gap-2">
-                <span>💬</span> Đồng học AI (Flash Lite)
-            </h3>
+            <h3 class="font-bold flex items-center gap-2"><span>💬</span> Đồng học AI</h3>
             <button id="closeChatBtn" class="text-white hover:text-blue-200 p-1 bg-white/10 rounded-md transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
         </div>
-        
-        <div id="chatHistory" class="flex-1 overflow-y-auto p-4 bg-slate-50 space-y-4 text-sm pb-20">
-            <div class="flex flex-col gap-1 items-start">
-                <span class="text-[10px] text-slate-400 font-bold ml-1">AI TRỢ LÝ</span>
-                <div class="bg-white p-3 rounded-xl rounded-tl-sm shadow-sm border border-slate-100 max-w-[85%] text-slate-700">
-                    Chào bạn! Mình đã đọc và ghi nhớ toàn bộ tài liệu này. Bạn muốn thảo luận, hay có chỗ nào cần giải đáp thêm không?
-                </div>
-            </div>
-        </div>
-
+        <div id="chatHistory" class="flex-1 overflow-y-auto p-4 bg-slate-50 text-sm pb-20"></div>
         <div class="p-3 md:p-4 bg-white border-t border-slate-200 shrink-0 shadow-[0_-4px_10px_rgba(0,0,0,0.03)] pb-8 md:pb-4">
             <div id="quotePreview" class="hidden mb-2 p-2 bg-blue-50 border-l-4 border-blue-400 text-xs text-slate-600 rounded-r line-clamp-2 italic relative pr-6">
-                <button onclick="clearQuote()" class="absolute top-1 right-1 text-slate-400 hover:text-red-500 bg-white rounded-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
-                </button>
+                <button onclick="clearQuote()" class="absolute top-1 right-1 text-slate-400 hover:text-red-500 bg-white rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg></button>
                 <span id="quoteText" class="font-medium text-blue-800"></span>
             </div>
             <div class="flex gap-2 relative">
                 <input type="text" id="chatInput" class="flex-1 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 text-sm transition-all" placeholder="Nhắn tin cho AI...">
-                <button id="sendChatBtn" class="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-xl transition-colors flex items-center justify-center aspect-square disabled:bg-slate-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" /></svg>
-                </button>
+                <button id="sendChatBtn" class="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-xl transition-colors flex items-center justify-center aspect-square disabled:bg-slate-300"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" /></svg></button>
             </div>
         </div>
     </div>
 
-    <!-- Modal Lịch Sử (Lưu trữ bằng IndexedDB) -->
+    <!-- Modal Lịch Sử -->
     <div id="historyModal" class="fixed inset-0 bg-slate-900/40 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden">
             <div class="p-5 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+                <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2"><span>☁️</span> Thư viện Đám mây</h2>
+                <button onclick="closeHistoryModal()" class="text-slate-400 hover:text-slate-700 p-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
+            </div>
+            <div id="historyList" class="p-4 overflow-y-auto flex-1 space-y-3 bg-slate-100/50"></div>
+        </div>
+    </div>
+
+    <!-- ✨ Modal Ví Khóa AI (Key Wallet) MỚI -->
+    <div id="setupModal" class="fixed inset-0 bg-slate-900/40 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
+            <div class="p-5 border-b border-slate-200 flex justify-between items-center bg-slate-50 shrink-0">
                 <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
-                    <span>📚</span> Thư viện & Lịch sử
+                    <span>🗂️</span> Ví Khóa AI (Key Wallet)
                 </h2>
-                <button onclick="closeHistoryModal()" class="text-slate-400 hover:text-slate-700 p-2">
+                <button onclick="closeSetupModal()" id="closeSetupBtn" class="text-slate-400 hover:text-slate-700 p-2 transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
             </div>
-            <div id="historyList" class="p-4 overflow-y-auto flex-1 space-y-3 bg-slate-100/50">
-                <!-- Danh sách bài viết sẽ đổ vào đây -->
+            
+            <div class="overflow-y-auto flex-1 p-5 md:p-6 bg-slate-50/50">
+                <!-- Cảnh báo chưa đăng nhập -->
+                <div id="walletLoggedOut" class="hidden mb-6 bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-xl text-sm">
+                    <strong>Bạn đang dùng Chế độ Ẩn danh.</strong> Cấu hình dưới đây chỉ lưu tạm trên máy này. Đăng nhập để sử dụng tính năng <em>Kho lưu trữ nhiều Khóa và Tự động chuyển nguồn</em>.
+                </div>
+
+                <!-- Tính năng Auto-Fallback -->
+                <div id="walletControls" class="hidden mb-6 bg-white p-4 border border-blue-100 rounded-xl shadow-sm flex justify-between items-center">
+                    <div>
+                        <h4 class="font-bold text-slate-800 text-sm">Tự động chuyển nguồn (Auto-Fallback)</h4>
+                        <p class="text-xs text-slate-500 mt-0.5">Tự động dùng khóa dự phòng tiếp theo nếu khóa hiện tại hết hạn mức.</p>
+                    </div>
+                    <!-- Nút Gạt -->
+                    <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+                        <input type="checkbox" name="toggle" id="autoFallbackToggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer transition-all duration-300 z-10"/>
+                        <label for="autoFallbackToggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-slate-300 cursor-pointer transition-colors duration-300"></label>
+                    </div>
+                </div>
+
+                <!-- Danh sách Key -->
+                <div class="mb-6">
+                    <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-3">Danh sách Khóa của bạn</h3>
+                    <div id="keyList" class="space-y-3">
+                        <!-- Render JS -->
+                    </div>
+                </div>
+
+                <!-- Form Thêm Key Mới -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                    <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-3">Thêm Cấu hình mới</h3>
+                    <input type="text" id="newKeyName" class="w-full mb-3 p-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm" placeholder="Tên gợi nhớ (VD: Khóa Dự Phòng 1)...">
+                    <textarea id="configInputBox" class="w-full h-32 p-3 bg-slate-800 text-green-400 font-mono text-xs md:text-sm rounded-lg focus:ring-2 focus:ring-blue-500 outline-none resize-none shadow-inner" placeholder="const firebaseConfig = { ... };"></textarea>
+                    
+                    <div id="configErrorMsg" class="hidden mt-3 text-red-500 text-sm font-medium bg-red-50 p-3 rounded-lg border border-red-100"></div>
+
+                    <button id="saveConfigBtn" class="mt-4 w-full py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 shadow-sm transition-all flex items-center justify-center gap-2">
+                        + Thêm vào Kho & Sử dụng ngay
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+        import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, getDocs, collection, deleteDoc, query } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
         import { getAI, getGenerativeModel, GoogleAIBackend } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-ai.js";
 
         // ==========================================
-        // HỆ THỐNG LƯU TRỮ INDEXED-DB (AUTO-SAVE)
+        // 1. KÉT SẮT CLOUD & XÁC THỰC
         // ==========================================
-        const DB_NAME = 'DeepReadDB';
-        const STORE_NAME = 'articles';
+        const systemConfig = {
+            apiKey: "AIzaSyCBZwAol847lfKqq0C_LbU3yKApOb3WDIE",
+            authDomain: "nc-firestore.firebaseapp.com",
+            projectId: "nc-firestore",
+            storageBucket: "nc-firestore.firebasestorage.app",
+            messagingSenderId: "225575571621",
+            appId: "1:225575571621:web:94b8abd8178d2ee24abd4c"
+        };
+        const sysApp = initializeApp(systemConfig, "SystemDatabaseApp");
+        const auth = getAuth(sysApp);
+        const db = getFirestore(sysApp);
+        
+        let currentUser = null;
+        const APP_NAMESPACE = typeof __app_id !== 'undefined' ? __app_id : 'deepread-cloud';
+        
+        function getCollectionPath() { return `artifacts/${APP_NAMESPACE}/users/${currentUser.uid}/articles`; }
+        function getWalletPath() { return `artifacts/${APP_NAMESPACE}/users/${currentUser.uid}/settings`; }
+
+        const provider = new GoogleAuthProvider();
+        document.getElementById('loginBtn').addEventListener('click', () => signInWithPopup(auth, provider).catch(e => alert(e.message)));
+        document.getElementById('logoutBtn').addEventListener('click', () => { signOut(auth); document.getElementById('logoutMenu').classList.add('hidden'); document.getElementById('newReadBtn').click(); });
+        window.toggleLogoutMenu = () => document.getElementById('logoutMenu').classList.toggle('hidden');
+
+        onAuthStateChanged(auth, async (user) => {
+            currentUser = user;
+            const loginBtn = document.getElementById('loginBtn');
+            const userInfo = document.getElementById('userInfo');
+            const btnHistory = document.getElementById('btnHistory');
+            
+            if (user) {
+                loginBtn.classList.add('hidden');
+                userInfo.classList.remove('hidden');
+                document.getElementById('userAvatar').src = user.photoURL || 'https://ui-avatars.com/api/?name=User';
+                document.getElementById('userName').textContent = user.displayName?.split(' ')[0] || 'Tài khoản';
+                btnHistory.classList.remove('hidden');
+                document.getElementById('cloudWarning').classList.add('hidden');
+                
+                document.getElementById('cloudStatusIcon').textContent = "☁️";
+                document.getElementById('cloudStatusText').textContent = "Tài liệu đang được đồng bộ hóa lên Cloud.";
+                
+                document.getElementById('cloudKeyBadge').classList.remove('hidden'); // Hiện chấm xanh báo dùng cloud
+                await loadKeyWalletCloud(); // Tải ví từ Cloud
+            } else {
+                loginBtn.classList.remove('hidden');
+                userInfo.classList.add('hidden');
+                btnHistory.classList.add('hidden');
+                document.getElementById('logoutMenu').classList.add('hidden');
+                document.getElementById('cloudWarning').classList.remove('hidden');
+                
+                document.getElementById('cloudStatusIcon').textContent = "⚠️";
+                document.getElementById('cloudStatusText').textContent = "Chế độ Ẩn danh. Dữ liệu KHÔNG được lưu lên Cloud.";
+                
+                document.getElementById('cloudKeyBadge').classList.add('hidden');
+                loadKeyWalletLocal(); // Tải ví tạm từ Local
+            }
+        });
+
+        // ==========================================
+        // 2. VÍ KHÓA AI (KEY WALLET) & HOT-SWAP
+        // ==========================================
+        const LOCAL_CONFIG_KEY = 'deepread_local_wallet';
+        let walletData = { keys: [], autoFallback: false };
+        let model, chatModel, aiApp;
+
+        function parseConfigString(text) {
+            const config = {};
+            const keys = ['apiKey', 'authDomain', 'projectId', 'storageBucket', 'messagingSenderId', 'appId'];
+            for (let key of keys) {
+                const regex = new RegExp(`${key}\\s*:\\s*["'\`]([^"'\`]+)["'\`]`);
+                const match = text.match(regex);
+                if (match) config[key] = match[1];
+            }
+            if (!config.apiKey || !config.projectId) throw new Error("Không tìm thấy apiKey hoặc projectId hợp lệ.");
+            return config;
+        }
+
+        async function initAI(configObj) {
+            try {
+                if (aiApp) await deleteApp(aiApp); // ✨ HOT-SWAP: Hủy app cũ trước khi nạp app mới
+                aiApp = initializeApp(configObj, 'AI-Engine-' + Date.now());
+                const ai = getAI(aiApp, { backend: new GoogleAIBackend() });
+                model = getGenerativeModel(ai, { model: "gemini-2.5-flash" });
+                chatModel = getGenerativeModel(ai, { model: "gemini-3.1-flash-lite-preview" });
+                
+                document.getElementById('statusText').innerHTML = '<span class="text-green-600 text-lg">●</span> Động cơ AI Sẵn sàng';
+                return true;
+            } catch (e) {
+                document.getElementById('statusText').innerHTML = `<span class="text-red-600 text-lg">●</span> Lỗi kết nối AI`;
+                throw e;
+            }
+        }
+
+        // Tải Ví (Từ Cloud hoặc Local)
+        async function loadKeyWalletCloud() {
+            try {
+                const docSnap = await getDoc(doc(db, getWalletPath(), 'wallet'));
+                if (docSnap.exists()) {
+                    walletData = docSnap.data();
+                } else {
+                    // Migrate từ Local lên Cloud nếu có
+                    const local = localStorage.getItem(LOCAL_CONFIG_KEY);
+                    if (local) walletData = JSON.parse(local);
+                    await saveKeyWalletToCloud();
+                }
+                document.getElementById('autoFallbackToggle').checked = walletData.autoFallback;
+                activateRunningKey();
+            } catch (e) { console.error("Lỗi tải Ví từ Cloud", e); }
+        }
+
+        function loadKeyWalletLocal() {
+            const local = localStorage.getItem(LOCAL_CONFIG_KEY);
+            if (local) walletData = JSON.parse(local);
+            else walletData = { keys: [], autoFallback: false };
+            activateRunningKey();
+        }
+
+        async function saveKeyWallet() {
+            if (currentUser) await saveKeyWalletToCloud();
+            else localStorage.setItem(LOCAL_CONFIG_KEY, JSON.stringify(walletData));
+            renderWalletUI();
+        }
+
+        async function saveKeyWalletToCloud() {
+            try { await setDoc(doc(db, getWalletPath(), 'wallet'), walletData); }
+            catch (e) { console.error("Lỗi lưu Ví lên Cloud", e); }
+        }
+
+        // Kích hoạt khóa đang chọn
+        function activateRunningKey() {
+            const activeKey = walletData.keys.find(k => k.isActive) || walletData.keys[0];
+            if (activeKey) {
+                try {
+                    const configObj = parseConfigString(activeKey.configStr);
+                    initAI(configObj);
+                } catch(e) { console.error("Khóa lỗi cú pháp", e); }
+            } else {
+                model = null; chatModel = null;
+                document.getElementById('statusText').innerHTML = '<span class="text-amber-500 text-lg">●</span> Chưa có Khóa AI';
+            }
+            renderWalletUI();
+        }
+
+        // UI Ví Khóa
+        function renderWalletUI() {
+            const listDiv = document.getElementById('keyList');
+            if (walletData.keys.length === 0) {
+                listDiv.innerHTML = '<p class="text-sm text-slate-400 italic">Kho Khóa trống. Vui lòng thêm cấu hình mới bên dưới.</p>';
+                return;
+            }
+
+            let html = '';
+            walletData.keys.forEach((k, index) => {
+                const badge = k.isActive 
+                    ? `<span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-[10px] font-bold">ĐANG DÙNG</span>` 
+                    : ``;
+                const btnAction = k.isActive
+                    ? ``
+                    : `<button onclick="switchKey('${k.id}')" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-md font-medium transition">Sử dụng</button>`;
+                
+                html += `
+                    <div class="flex items-center justify-between p-3 bg-white border ${k.isActive ? 'border-green-300 ring-1 ring-green-100' : 'border-slate-200'} rounded-lg shadow-sm">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="font-semibold text-slate-800 text-sm">${k.name}</span>
+                                ${badge}
+                            </div>
+                            <p class="text-[10px] text-slate-400 font-mono truncate w-32 md:w-48">${k.configStr.substring(0, 30)}...</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            ${btnAction}
+                            <button onclick="deleteKey('${k.id}')" class="text-slate-300 hover:text-red-500 p-1" title="Xóa khóa này"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>
+                        </div>
+                    </div>
+                `;
+            });
+            listDiv.innerHTML = html;
+        }
+
+        window.openSetup = function() {
+            if (currentUser) {
+                document.getElementById('walletLoggedOut').classList.add('hidden');
+                document.getElementById('walletControls').classList.remove('hidden');
+            } else {
+                document.getElementById('walletLoggedOut').classList.remove('hidden');
+                document.getElementById('walletControls').classList.add('hidden');
+            }
+            
+            document.getElementById('closeSetupBtn').classList.toggle('hidden', walletData.keys.length === 0);
+            renderWalletUI();
+            document.getElementById('setupModal').classList.remove('hidden');
+        };
+
+        window.closeSetupModal = function() {
+            if (walletData.keys.length > 0) document.getElementById('setupModal').classList.add('hidden');
+        };
+
+        // Các hành động trong Ví
+        document.getElementById('saveConfigBtn').addEventListener('click', async () => {
+            const rawText = document.getElementById('configInputBox').value.trim();
+            const nameText = document.getElementById('newKeyName').value.trim() || `Khóa ${walletData.keys.length + 1}`;
+            const errorMsg = document.getElementById('configErrorMsg');
+            errorMsg.classList.add('hidden');
+
+            try {
+                parseConfigString(rawText); // Verify syntax
+                
+                // Set all other keys to inactive
+                walletData.keys.forEach(k => k.isActive = false);
+                
+                walletData.keys.push({
+                    id: 'key-' + Date.now(),
+                    name: nameText,
+                    configStr: rawText,
+                    isActive: true
+                });
+
+                await saveKeyWallet();
+                activateRunningKey();
+                
+                document.getElementById('configInputBox').value = '';
+                document.getElementById('newKeyName').value = '';
+                
+                if (!document.getElementById('readingScreen').classList.contains('hidden') === false) {
+                    showScreen('input');
+                }
+                closeSetupModal();
+            } catch (e) {
+                errorMsg.innerText = "Lỗi cấu hình: " + e.message;
+                errorMsg.classList.remove('hidden');
+            }
+        });
+
+        window.switchKey = async function(id) {
+            walletData.keys.forEach(k => k.isActive = (k.id === id));
+            await saveKeyWallet();
+            activateRunningKey();
+        };
+
+        window.deleteKey = async function(id) {
+            if(!confirm("Bạn có chắc muốn xóa khóa này?")) return;
+            const keyToDelete = walletData.keys.find(k => k.id === id);
+            walletData.keys = walletData.keys.filter(k => k.id !== id);
+            
+            // Nếu xóa khóa đang dùng, tự động active khóa đầu tiên còn lại
+            if (keyToDelete && keyToDelete.isActive && walletData.keys.length > 0) {
+                walletData.keys[0].isActive = true;
+            }
+            
+            await saveKeyWallet();
+            activateRunningKey();
+        };
+
+        document.getElementById('autoFallbackToggle').addEventListener('change', async (e) => {
+            walletData.autoFallback = e.target.checked;
+            await saveKeyWallet();
+        });
+
+        // ==========================================
+        // 3. ✨ CƠ CHẾ AUTO-FALLBACK (TỰ ĐỘNG CHUYỂN KHÓA)
+        // ==========================================
+        async function executeAITask(operationType, payload) {
+            let attempts = 0;
+            const maxAttempts = walletData.autoFallback ? walletData.keys.length : 1;
+
+            while (attempts < maxAttempts) {
+                try {
+                    if (!model || !chatModel) throw new Error("AI chưa được khởi tạo");
+                    if (operationType === 'text') return await model.generateContent(payload);
+                    if (operationType === 'chat') return await chatModel.generateContent(payload);
+                } catch (error) {
+                    attempts++;
+                    console.warn(`Lỗi AI (Lần thử ${attempts}):`, error.message);
+
+                    if (walletData.autoFallback && attempts < maxAttempts) {
+                        document.getElementById('statusText').innerHTML = `<span class="text-amber-500 text-xs">Đang kẹt, tự động đổi khóa...</span>`;
+                        
+                        // Tìm khóa tiếp theo
+                        let currentIndex = walletData.keys.findIndex(k => k.isActive);
+                        let nextIndex = (currentIndex + 1) % walletData.keys.length;
+                        
+                        // Đổi khóa nóng
+                        walletData.keys.forEach((k, i) => k.isActive = (i === nextIndex));
+                        await saveKeyWallet();
+                        activateRunningKey();
+                        
+                        // Đợi 1s cho app mới khởi tạo xong rồi loop lại try-catch
+                        await new Promise(r => setTimeout(r, 1000));
+                        continue; 
+                    }
+                    throw error; // Nếu hết khóa để thử hoặc tắt fallback -> ném lỗi ra ngoài
+                }
+            }
+        }
+
+        // Khởi động
+        window.onload = function() {
+            showScreen('input'); 
+            loadKeyWalletLocal(); // Tạm load local cho đến khi Auth xác nhận xong
+            if (walletData.keys.length === 0) openSetup();
+        };
+
+        // ==========================================
+        // 4. LOGIC LƯU TRỮ ĐÁM MÂY (FIRESTORE)
+        // ==========================================
+        const screens = { input: document.getElementById('inputScreen'), loading: document.getElementById('loadingScreen'), reading: document.getElementById('readingScreen') };
+        function showScreen(screenName) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[screenName].classList.remove('hidden'); }
+
         let currentArticleId = null;
 
-        function openDB() {
-            return new Promise((resolve, reject) => {
-                const request = indexedDB.open(DB_NAME, 1);
-                request.onerror = e => reject(e.target.error);
-                request.onsuccess = e => resolve(e.target.result);
-                request.onupgradeneeded = e => {
-                    const db = e.target.result;
-                    if (!db.objectStoreNames.contains(STORE_NAME)) {
-                        db.createObjectStore(STORE_NAME, { keyPath: 'id' });
-                    }
-                };
-            });
-        }
-
-        async function saveToDB(article) {
-            const db = await openDB();
-            return new Promise((resolve, reject) => {
-                const tx = db.transaction(STORE_NAME, 'readwrite');
-                const store = tx.objectStore(STORE_NAME);
-                store.put(article);
-                tx.oncomplete = () => resolve();
-                tx.onerror = () => reject(tx.error);
-            });
-        }
-
-        async function getAllFromDB() {
-            const db = await openDB();
-            return new Promise((resolve, reject) => {
-                const tx = db.transaction(STORE_NAME, 'readonly');
-                const store = tx.objectStore(STORE_NAME);
-                const request = store.getAll();
-                request.onsuccess = () => resolve(request.result);
-                request.onerror = () => reject(request.error);
-            });
-        }
-
-        async function getOneFromDB(id) {
-            const db = await openDB();
-            return new Promise((resolve, reject) => {
-                const tx = db.transaction(STORE_NAME, 'readonly');
-                const store = tx.objectStore(STORE_NAME);
-                const request = store.get(id);
-                request.onsuccess = () => resolve(request.result);
-                request.onerror = () => reject(request.error);
-            });
-        }
-
-        async function deleteFromDB(id) {
-            const db = await openDB();
-            return new Promise((resolve, reject) => {
-                const tx = db.transaction(STORE_NAME, 'readwrite');
-                const store = tx.objectStore(STORE_NAME);
-                store.delete(id);
-                tx.oncomplete = () => resolve();
-                tx.onerror = () => reject(tx.error);
-            });
-        }
-
-        // HÀM AUTO-SAVE CHÍNH THỨC
         window.autoSave = async function() {
-            if (!currentArticleId) return;
+            if (!currentArticleId || !currentUser) return; 
             try {
-                // Tạo tiêu đề tự động từ văn bản đã format
                 let title = "Bài viết không có tiêu đề";
                 if (globalFormattedText) {
-                    // Cố gắng lấy thẻ H1/H2 hoặc câu đầu tiên làm tiêu đề
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = marked.parse(globalFormattedText);
+                    const tempDiv = document.createElement('div'); tempDiv.innerHTML = marked.parse(globalFormattedText);
                     const heading = tempDiv.querySelector('h1, h2, h3, p');
-                    if (heading && heading.textContent.trim()) {
-                        title = heading.textContent.trim().substring(0, 60) + "...";
-                    }
+                    if (heading && heading.textContent.trim()) title = heading.textContent.trim().substring(0, 60) + "...";
                 }
-
                 const articleData = {
-                    id: currentArticleId,
-                    title: title,
-                    rawText: document.getElementById('mainInput').value,
-                    globalFormattedText: globalFormattedText, // Lưu ngữ cảnh chuẩn cho AI
-                    formattedHtml: document.getElementById('contentArea').innerHTML,
-                    summaryHtml: document.getElementById('summaryArea').innerHTML,
-                    chatMessages: chatMessages,
-                    chatHtml: document.getElementById('chatHistory').innerHTML,
-                    lastModified: Date.now()
+                    id: currentArticleId, title: title, rawText: document.getElementById('mainInput').value, globalFormattedText: globalFormattedText,
+                    formattedHtml: document.getElementById('contentArea').innerHTML, summaryHtml: document.getElementById('summaryArea').innerHTML,
+                    chatMessages: chatMessages, chatHtml: document.getElementById('chatHistory').innerHTML, lastModified: Date.now()
                 };
-                await saveToDB(articleData);
-            } catch (error) {
-                console.error("Lỗi Auto-save:", error);
-            }
+                await setDoc(doc(db, getCollectionPath(), currentArticleId), articleData);
+            } catch (error) { console.error("Lỗi đồng bộ Cloud:", error); }
         };
 
-        // ==========================================
-        // KHỞI TẠO FIREBASE AI
-        // ==========================================
-const firebaseConfig = {
-  apiKey: "AIzaSyBsTFay_kTVzr2J50pxrAUdiuOBkwNSJHY",
-  authDomain: "aith-c70eb.firebaseapp.com",
-  projectId: "aith-c70eb",
-  storageBucket: "aith-c70eb.firebasestorage.app",
-  messagingSenderId: "556224999133",
-  appId: "1:556224999133:web:a79ae0f22b612dc167b534"
-};
-
-
-        let model, chatModel;
-        const app = initializeApp(firebaseConfig);
-        const statusText = document.getElementById('statusText');
-
-        try {
-            const ai = getAI(app, { backend: new GoogleAIBackend() });
-            model = getGenerativeModel(ai, { model: "gemini-2.5-flash" });
-            chatModel = getGenerativeModel(ai, { model: "gemini-3.1-flash-lite-preview" });
-            statusText.innerHTML = '<span class="text-green-600 text-lg">●</span> AI Sẵn sàng';
-        } catch (e) {
-            console.error("Lỗi AI:", e);
-            statusText.innerHTML = `<span class="text-red-600 text-lg">●</span> Lỗi: ${e.message}`;
-        }
-
-        let globalFormattedText = "";
-        let currentSelectedText = "";
-        let currentSelectionRange = null;
-
-        const screens = {
-            input: document.getElementById('inputScreen'),
-            loading: document.getElementById('loadingScreen'),
-            reading: document.getElementById('readingScreen')
-        };
-        const mainInput = document.getElementById('mainInput');
-        const contentArea = document.getElementById('contentArea');
-        const summaryArea = document.getElementById('summaryArea');
-        const floatingMenu = document.getElementById('floatingMenu');
-        const newReadBtn = document.getElementById('newReadBtn');
-
-        function showScreen(screenName) {
-            Object.values(screens).forEach(s => s.classList.add('hidden'));
-            screens[screenName].classList.remove('hidden');
-        }
-
-        // ==========================================
-        // UI LỊCH SỬ (MODAL)
-        // ==========================================
         window.openHistoryModal = async function() {
+            if (!currentUser) return alert("Vui lòng đăng nhập!");
             const historyList = document.getElementById('historyList');
             historyList.innerHTML = '<div class="text-center p-4"><div class="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div></div>';
             document.getElementById('historyModal').classList.remove('hidden');
 
             try {
-                const articles = await getAllFromDB();
-                if (articles.length === 0) {
-                    historyList.innerHTML = '<div class="text-center text-slate-400 p-6 italic">Thư viện trống. Hãy phân tích bài viết đầu tiên của bạn!</div>';
-                    return;
-                }
+                const snapshot = await getDocs(query(collection(db, getCollectionPath())));
+                const articles = []; snapshot.forEach(docSnap => articles.push(docSnap.data()));
+                if (articles.length === 0) { historyList.innerHTML = '<div class="text-center text-slate-400 p-6 italic">Thư viện trống.</div>'; return; }
 
-                // Sắp xếp mới nhất lên đầu
                 articles.sort((a, b) => b.lastModified - a.lastModified);
-                
                 let html = '';
                 articles.forEach(art => {
-                    const date = new Date(art.lastModified).toLocaleString('vi-VN', { 
-                        hour: '2-digit', minute:'2-digit', day:'2-digit', month:'2-digit', year:'numeric' 
-                    });
+                    const date = new Date(art.lastModified).toLocaleString('vi-VN', { hour: '2-digit', minute:'2-digit', day:'2-digit', month:'2-digit', year:'numeric' });
                     html += `
-                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:border-blue-300 transition-colors flex justify-between items-center group cursor-pointer" onclick="loadArticle('${art.id}')">
-                            <div class="flex-1 pr-4">
-                                <h4 class="font-bold text-slate-800 text-[15px] mb-1 group-hover:text-blue-700">${art.title}</h4>
-                                <p class="text-xs text-slate-400 flex items-center gap-1">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                    Đọc lần cuối: ${date}
-                                </p>
-                            </div>
-                            <button onclick="deleteArticle('${art.id}', event)" class="text-slate-300 hover:text-red-500 p-2 rounded-lg hover:bg-red-50 transition-colors" title="Xóa tài liệu này">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                            </button>
-                        </div>
-                    `;
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:border-blue-300 transition-colors flex justify-between items-center group cursor-pointer" onclick="loadArticleObj(${JSON.stringify(art).replace(/"/g, '&quot;')})">
+                            <div class="flex-1 pr-4"><h4 class="font-bold text-slate-800 text-[15px] mb-1 group-hover:text-blue-700">${art.title}</h4><p class="text-xs text-slate-400">Đồng bộ lúc: ${date}</p></div>
+                            <button onclick="deleteArticleCloud('${art.id}', event)" class="text-slate-300 hover:text-red-500 p-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>
+                        </div>`;
                 });
                 historyList.innerHTML = html;
-            } catch (e) {
-                historyList.innerHTML = '<div class="text-center text-red-500 p-4">Lỗi tải dữ liệu.</div>';
-            }
+            } catch (e) { historyList.innerHTML = '<div class="text-center text-red-500 p-4">Lỗi tải dữ liệu.</div>'; }
         };
 
-        window.closeHistoryModal = function() {
-            document.getElementById('historyModal').classList.add('hidden');
+        window.closeHistoryModal = function() { document.getElementById('historyModal').classList.add('hidden'); };
+
+        window.loadArticleObj = function(article) {
+            currentArticleId = article.id; mainInput.value = article.rawText || ''; globalFormattedText = article.globalFormattedText || '';
+            contentArea.innerHTML = article.formattedHtml; summaryArea.innerHTML = article.summaryHtml; summaryArea.classList.remove('hidden');
+            chatMessages = article.chatMessages || []; document.getElementById('chatHistory').innerHTML = article.chatHtml || '';
+            showScreen('reading'); newReadBtn.classList.remove('hidden'); document.getElementById('openChatBtn').classList.remove('hidden');
+            closeHistoryModal();
         };
 
-        window.loadArticle = async function(id) {
-            try {
-                const article = await getOneFromDB(id);
-                if (!article) return;
-
-                currentArticleId = article.id;
-                mainInput.value = article.rawText || '';
-                globalFormattedText = article.globalFormattedText || '';
-                
-                contentArea.innerHTML = article.formattedHtml;
-                summaryArea.innerHTML = article.summaryHtml;
-                summaryArea.classList.remove('hidden');
-                
-                // Khôi phục bộ nhớ Chat
-                chatMessages = article.chatMessages || [];
-                document.getElementById('chatHistory').innerHTML = article.chatHtml || '';
-
-                showScreen('reading');
-                newReadBtn.classList.remove('hidden');
-                document.getElementById('openChatBtn').classList.remove('hidden');
-                closeHistoryModal();
-            } catch (e) {
-                alert("Không thể tải bài viết: " + e.message);
-            }
-        };
-
-        window.deleteArticle = async function(id, event) {
-            event.stopPropagation(); // Ngăn click nhầm vào loadArticle
-            if (confirm("Bạn có chắc chắn muốn xóa bài viết này khỏi Lịch sử?")) {
-                await deleteFromDB(id);
-                // Nếu đang đọc bài bị xóa, reset ra màn hình chính
-                if (currentArticleId === id) {
-                    newReadBtn.click(); 
-                }
-                openHistoryModal(); // Tải lại danh sách
+        window.deleteArticleCloud = async function(id, event) {
+            event.stopPropagation();
+            if (currentUser && confirm("Xóa vĩnh viễn khỏi Đám mây?")) {
+                await deleteDoc(doc(db, getCollectionPath(), id));
+                if (currentArticleId === id) newReadBtn.click(); openHistoryModal();
             }
         };
 
         // ==========================================
-        // TẠO MỚI & AI FORMATTING
+        // 5. CÁC TÁC VỤ AI (Sử dụng Auto-Fallback Wrapper)
         // ==========================================
+        let globalFormattedText = ""; let currentSelectedText = ""; let currentSelectionRange = null;
+        const contentArea = document.getElementById('contentArea'); const summaryArea = document.getElementById('summaryArea');
+        const floatingMenu = document.getElementById('floatingMenu'); const newReadBtn = document.getElementById('newReadBtn');
+
         document.getElementById('startBtn').addEventListener('click', async () => {
-            const rawText = mainInput.value.trim();
-            if (!rawText) return;
+            if(walletData.keys.length === 0) return alert("Kho khóa trống. Vui lòng thêm Khóa AI ở mục Cài đặt ⚙️");
+            const rawText = mainInput.value.trim(); if (!rawText) return;
 
-            // Khởi tạo ID mới cho phiên làm việc
-            currentArticleId = Date.now().toString();
-
-            showScreen('loading');
-            newReadBtn.classList.remove('hidden');
-            document.getElementById('openChatBtn').classList.remove('hidden');
+            currentArticleId = Date.now().toString(); showScreen('loading');
+            newReadBtn.classList.remove('hidden'); document.getElementById('openChatBtn').classList.remove('hidden');
 
             try {
-                const formatPrompt = `Bạn là một biên tập viên xuất sắc. Dưới đây là một đoạn văn bản thô copy từ internet.
-Nhiệm vụ của bạn là: Dọn dẹp, ngắt đoạn, thêm các thẻ Tiêu đề (Heading), In đậm (Bold) hoặc Danh sách (List) bằng ngôn ngữ Markdown để bài viết trông chuyên nghiệp, mạch lạc và dễ đọc nhất.
-QUY TẮC TỐI THƯỢNG: TUYỆT ĐỐI GIỮ NGUYÊN 100% NỘI DUNG VĂN BẢN GỐC, KHÔNG ĐƯỢC TÓM TẮT, KHÔNG THÊM BỚT BẤT KỲ CÂU CHỮ NÀO.
-LƯU Ý QUAN TRỌNG: Trả về trực tiếp văn bản định dạng. KHÔNG BAO GIỜ bọc kết quả trong thẻ blockcode (như \`\`\`markdown hay \`\`\`).
-
-Văn bản thô:
-"""
-${rawText}
-"""`;
-                const formatResult = await model.generateContent(formatPrompt);
-                let textResult = formatResult.response.text();
-                textResult = textResult.replace(/^```(markdown|html|txt)?\n/i, '').replace(/\n```$/i, '').trim();
+                const formatPrompt = `Bạn là biên tập viên. Dọn dẹp, thêm Heading, Bold, List bằng Markdown cho văn bản sau. TUYỆT ĐỐI GIỮ NGUYÊN 100% NỘI DUNG. Không bọc trong code block.\n\n"""\n${rawText}\n"""`;
                 
-                globalFormattedText = textResult;
-                contentArea.innerHTML = marked.parse(globalFormattedText);
-                showScreen('reading');
-
-                // Reset chat cho bài mới
-                resetChatHistory();
-
-                // Lưu bản nháp đầu tiên
-                autoSave();
-
-                // Chạy ngầm Tóm tắt
-                generateOverallSummary(globalFormattedText);
-
-            } catch (error) {
-                console.error(error);
-                alert("Lỗi khi định dạng: " + error.message);
-                showScreen('input');
-            }
+                // ✨ Dùng Wrapper Auto-Fallback
+                const formatResult = await executeAITask('text', formatPrompt);
+                
+                let textResult = formatResult.response.text().replace(/^```(markdown|html|txt)?\n/i, '').replace(/\n```$/i, '').trim();
+                globalFormattedText = textResult; contentArea.innerHTML = marked.parse(globalFormattedText);
+                showScreen('reading'); resetChatHistory(); autoSave(); generateOverallSummary(globalFormattedText);
+            } catch (error) { alert("Lỗi phân tích (Đã thử mọi khóa): " + error.message); showScreen('input'); }
         });
 
         newReadBtn.addEventListener('click', () => {
-            currentArticleId = null; // Cắt đứt kết nối với bài cũ
-            mainInput.value = '';
-            contentArea.innerHTML = '';
-            summaryArea.innerHTML = '';
-            summaryArea.classList.add('hidden');
-            globalFormattedText = '';
-            floatingMenu.classList.remove('active');
-            showScreen('input');
-            newReadBtn.classList.add('hidden');
-            document.getElementById('openChatBtn').classList.add('hidden');
-            document.getElementById('chatDrawer').classList.add('translate-x-full');
-            clearQuote();
-            resetChatHistory();
+            currentArticleId = null; mainInput.value = ''; contentArea.innerHTML = ''; summaryArea.innerHTML = ''; summaryArea.classList.add('hidden');
+            globalFormattedText = ''; floatingMenu.classList.remove('active'); showScreen('input');
+            newReadBtn.classList.add('hidden'); document.getElementById('openChatBtn').classList.add('hidden'); document.getElementById('chatDrawer').classList.add('translate-x-full');
+            clearQuote(); resetChatHistory();
         });
 
         async function generateOverallSummary(text) {
             try {
-                const summaryPrompt = `Đọc toàn bộ văn bản sau và viết một TÓM TẮT NGẮN GỌN (Khoảng 3-4 gạch đầu dòng) về các ý chính nhất. 
-Văn bản: """${text}"""`;
-                const result = await model.generateContent(summaryPrompt);
-                
-                summaryArea.innerHTML = `
-                    <div class="bg-blue-50/50 p-6 rounded-2xl border border-blue-100/50">
-                        <h3 class="text-sm font-bold text-blue-700 uppercase tracking-widest mb-3 flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                            Tóm tắt siêu tốc
-                        </h3>
-                        <div class="prose prose-sm max-w-none text-slate-700">
-                            ${marked.parse(result.response.text())}
-                        </div>
-                    </div>
-                `;
-                summaryArea.classList.remove('hidden');
-                autoSave(); // ✨ Lưu lại sau khi có tóm tắt
-            } catch (error) {
-                console.error("Lỗi tóm tắt ngầm:", error);
-            }
+                const summaryPrompt = `Đọc văn bản sau và viết một TÓM TẮT NGẮN GỌN (3-4 gạch đầu dòng) về các ý chính nhất.\n"""${text}"""`;
+                // ✨ Dùng Wrapper
+                const result = await executeAITask('text', summaryPrompt);
+                summaryArea.innerHTML = `<div class="bg-blue-50/50 p-6 rounded-2xl border border-blue-100/50"><h3 class="text-sm font-bold text-blue-700 uppercase tracking-widest mb-3 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>Tóm tắt siêu tốc</h3><div class="prose prose-sm max-w-none text-slate-700">${marked.parse(result.response.text())}</div></div>`;
+                summaryArea.classList.remove('hidden'); autoSave();
+            } catch (error) { console.error("Lỗi tóm tắt:", error); }
         }
 
-        // ==========================================
-        // XỬ LÝ CHAT
-        // ==========================================
-        const chatDrawer = document.getElementById('chatDrawer');
-        const chatInput = document.getElementById('chatInput');
-        let chatMessages = []; 
-
-        document.getElementById('openChatBtn').addEventListener('click', () => {
-            chatDrawer.classList.remove('translate-x-full');
-            chatInput.focus();
-        });
-        document.getElementById('closeChatBtn').addEventListener('click', () => {
-            chatDrawer.classList.add('translate-x-full');
-        });
+        // --- XỬ LÝ CHAT ---
+        const chatDrawer = document.getElementById('chatDrawer'); const chatInput = document.getElementById('chatInput'); let chatMessages = []; 
+        document.getElementById('openChatBtn').addEventListener('click', () => { chatDrawer.classList.remove('translate-x-full'); chatInput.focus(); });
+        document.getElementById('closeChatBtn').addEventListener('click', () => chatDrawer.classList.add('translate-x-full'));
 
         window.quoteToChat = function() {
-            if (!currentSelectedText) return;
-            floatingMenu.classList.remove('active');
-            chatDrawer.classList.remove('translate-x-full');
-            document.getElementById('quoteText').textContent = `"...${currentSelectedText}..."`;
-            document.getElementById('quotePreview').classList.remove('hidden');
-            window.getSelection().removeAllRanges();
-            setTimeout(() => chatInput.focus(), 300);
+            if (!currentSelectedText) return; floatingMenu.classList.remove('active'); chatDrawer.classList.remove('translate-x-full');
+            document.getElementById('quoteText').textContent = `"...${currentSelectedText}..."`; document.getElementById('quotePreview').classList.remove('hidden');
+            window.getSelection().removeAllRanges(); setTimeout(() => chatInput.focus(), 300);
         };
-
-        window.clearQuote = function() {
-            document.getElementById('quotePreview').classList.add('hidden');
-            document.getElementById('quoteText').textContent = '';
-        };
+        window.clearQuote = function() { document.getElementById('quotePreview').classList.add('hidden'); document.getElementById('quoteText').textContent = ''; };
 
         function resetChatHistory() {
-            chatMessages = [];
-            document.getElementById('chatHistory').innerHTML = `
-                <div class="flex flex-col gap-1 items-start mb-4">
-                    <span class="text-[10px] text-slate-400 font-bold ml-1">✨ ĐỒNG HỌC AI</span>
-                    <div class="bg-white p-3 rounded-xl rounded-tl-sm shadow-sm border border-slate-100 max-w-[85%] text-slate-700 text-sm">
-                        Chào bạn! Mình đã đọc và ghi nhớ toàn bộ tài liệu này. Bạn muốn thảo luận, hay có chỗ nào cần giải đáp thêm không?
-                    </div>
-                </div>
-            `;
+            chatMessages = []; document.getElementById('chatHistory').innerHTML = `<div class="flex flex-col gap-1 items-start mb-6 w-full"><div class="flex items-center gap-1.5 ml-1 mb-1"><span class="text-lg">✨</span><span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Đồng học AI</span></div><div class="w-full bg-white p-4 md:p-5 rounded-xl shadow-sm border border-slate-200 text-slate-800 text-[15px] leading-relaxed">Chào bạn! Mình đã ghi nhớ toàn bộ tài liệu này. Bạn muốn thảo luận gì không?</div></div>`;
         }
-
-        function scrollToBottom() {
-            const h = document.getElementById('chatHistory');
-            h.scrollTop = h.scrollHeight;
-        }
+        function scrollToBottom() { const h = document.getElementById('chatHistory'); h.scrollTop = h.scrollHeight; }
 
         function appendMessage(role, content) {
             const msgDiv = document.createElement('div');
-            if (role === 'user') {
-                msgDiv.innerHTML = `
-                    <div class="flex flex-col gap-1 items-end mb-4">
-                        <span class="text-[10px] text-slate-400 font-bold mr-1">BẠN</span>
-                        <div class="bg-blue-600 text-white p-3 rounded-xl rounded-tr-sm shadow-sm max-w-[85%] text-sm">
-                            ${content}
-                        </div>
-                    </div>
-                `;
-            } else {
-                msgDiv.innerHTML = `
-                    <div class="flex flex-col gap-1 items-start mb-4">
-                        <span class="text-[10px] text-slate-400 font-bold ml-1">✨ ĐỒNG HỌC AI</span>
-                        <div class="bg-white p-3 rounded-xl rounded-tl-sm shadow-sm border border-slate-100 max-w-[85%] text-slate-700 text-sm prose prose-sm prose-blue overflow-hidden">
-                            ${marked.parse(content)}
-                        </div>
-                    </div>
-                `;
-            }
-            document.getElementById('chatHistory').appendChild(msgDiv);
-            scrollToBottom();
+            if (role === 'user') msgDiv.innerHTML = `<div class="flex flex-col gap-1 items-end mb-6"><span class="text-[10px] text-slate-400 font-bold mr-1 tracking-wider uppercase">Bạn</span><div class="bg-blue-600 text-white px-4 py-2.5 rounded-2xl rounded-tr-sm shadow-sm max-w-[85%] text-[15px] leading-relaxed">${content}</div></div>`;
+            else msgDiv.innerHTML = `<div class="flex flex-col gap-1 items-start mb-6 w-full"><div class="flex items-center gap-1.5 ml-1 mb-1"><span class="text-lg">✨</span><span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Đồng học AI</span></div><div class="w-full bg-white p-4 md:p-5 rounded-xl shadow-sm border border-slate-200 text-slate-800 text-[15px] leading-relaxed prose prose-sm md:prose-base prose-blue max-w-none overflow-x-auto">${marked.parse(content)}</div></div>`;
+            document.getElementById('chatHistory').appendChild(msgDiv); scrollToBottom();
         }
 
         async function sendChatMessage() {
-            const rawInput = chatInput.value.trim();
-            const quoteTextEl = document.getElementById('quoteText');
-            const quotePreview = document.getElementById('quotePreview');
-            const hasQuote = !quotePreview.classList.contains('hidden') && quoteTextEl.textContent;
-            
+            const rawInput = chatInput.value.trim(); const quoteTextEl = document.getElementById('quoteText');
+            const hasQuote = !document.getElementById('quotePreview').classList.contains('hidden') && quoteTextEl.textContent;
             if (!rawInput && !hasQuote) return;
 
-            let finalPrompt = rawInput;
-            let displayUI = rawInput;
-
+            let finalPrompt = rawInput; let displayUI = rawInput;
             if (hasQuote) {
-                const quote = quoteTextEl.textContent;
-                finalPrompt = `Tôi đang tham chiếu đến đoạn này trong tài liệu:\n${quote}\n\nYêu cầu của tôi:\n${rawInput || "Hãy giải thích thêm về đoạn này."}`;
-                displayUI = `<div class="bg-blue-700/50 p-2 rounded mb-2 text-xs italic border-l-2 border-blue-300 line-clamp-3">${quote}</div>${rawInput}`;
-                clearQuote();
+                const quote = quoteTextEl.textContent; finalPrompt = `Tham chiếu đến đoạn:\n${quote}\n\nYêu cầu:\n${rawInput || "Giải thích thêm."}`;
+                displayUI = `<div class="bg-blue-700/50 p-2 rounded mb-2 text-xs italic border-l-2 border-blue-300 line-clamp-3">${quote}</div>${rawInput}`; clearQuote();
             }
 
-            appendMessage('user', displayUI);
-            chatInput.value = '';
-            chatInput.disabled = true;
-            document.getElementById('sendChatBtn').disabled = true;
+            appendMessage('user', displayUI); chatInput.value = ''; chatInput.disabled = true; document.getElementById('sendChatBtn').disabled = true;
+            const loadingId = 'loading-' + Date.now(); const loadingIndicator = document.createElement('div'); loadingIndicator.id = loadingId;
+            loadingIndicator.innerHTML = `<div class="flex flex-col gap-1 items-start mb-6 w-full"><div class="flex items-center gap-1.5 ml-1 mb-1"><span class="text-lg">✨</span><span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Đồng học AI</span></div><div class="w-full bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center gap-2 h-12"><div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div><div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0.15s"></div><div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0.3s"></div></div></div>`;
+            document.getElementById('chatHistory').appendChild(loadingIndicator); scrollToBottom();
 
-            const loadingId = 'loading-' + Date.now();
-            const loadingIndicator = document.createElement('div');
-            loadingIndicator.id = loadingId;
-            loadingIndicator.innerHTML = `
-                <div class="flex flex-col gap-1 items-start mb-4">
-                    <span class="text-[10px] text-slate-400 font-bold ml-1">✨ ĐỒNG HỌC AI</span>
-                    <div class="bg-white p-3 rounded-xl rounded-tl-sm shadow-sm border border-slate-100 flex items-center gap-1.5 h-10">
-                        <div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></div>
-                        <div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0.15s"></div>
-                        <div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0.3s"></div>
-                    </div>
-                </div>
-            `;
-            document.getElementById('chatHistory').appendChild(loadingIndicator);
-            scrollToBottom();
-
-            if (chatMessages.length === 0) {
-                chatMessages.push({
-                    role: 'user',
-                    parts: [{ text: `Đây là toàn bộ tài liệu chúng ta sẽ thảo luận:\n\n${globalFormattedText}\n\n--- Hết tài liệu ---\n\nBây giờ, hãy trả lời câu hỏi/yêu cầu sau của tôi:\n${finalPrompt}` }]
-                });
-            } else {
-                chatMessages.push({
-                    role: 'user',
-                    parts: [{ text: finalPrompt }]
-                });
-            }
+            if (chatMessages.length === 0) chatMessages.push({ role: 'user', parts: [{ text: `Tài liệu:\n\n${globalFormattedText}\n\n---\n\nCâu hỏi:\n${finalPrompt}` }] });
+            else chatMessages.push({ role: 'user', parts: [{ text: finalPrompt }] });
 
             try {
-                const result = await chatModel.generateContent({ contents: chatMessages });
+                // ✨ Dùng Wrapper
+                const result = await executeAITask('chat', { contents: chatMessages });
                 const aiResponse = result.response.text();
-
                 chatMessages.push({ role: 'model', parts: [{ text: aiResponse }] });
-                document.getElementById(loadingId).remove();
-                appendMessage('model', aiResponse);
-                
-                autoSave(); // ✨ Lưu lịch sử chat
+                document.getElementById(loadingId).remove(); appendMessage('model', aiResponse); autoSave();
             } catch (error) {
-                document.getElementById(loadingId).remove();
-                appendMessage('model', `*Lỗi hệ thống:* ${error.message}`);
-                chatMessages.pop(); 
+                document.getElementById(loadingId).remove(); appendMessage('model', `*Lỗi hệ thống:* ${error.message}`); chatMessages.pop(); 
             } finally {
-                chatInput.disabled = false;
-                document.getElementById('sendChatBtn').disabled = false;
-                chatInput.focus();
-                scrollToBottom();
+                chatInput.disabled = false; document.getElementById('sendChatBtn').disabled = false; chatInput.focus(); scrollToBottom();
             }
         }
+        document.getElementById('sendChatBtn').addEventListener('click', sendChatMessage); chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendChatMessage(); });
 
-        document.getElementById('sendChatBtn').addEventListener('click', sendChatMessage);
-        chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendChatMessage(); });
-
-        // ==========================================
-        // CÔNG CỤ INLINE & MENU NỔI
-        // ==========================================
+        // --- CÔNG CỤ INLINE ---
         function handleSelection() {
-            const selection = window.getSelection();
-            const text = selection.toString().trim();
-
+            const selection = window.getSelection(); const text = selection.toString().trim();
             if (text.length > 5) {
-                currentSelectedText = text;
-                currentSelectionRange = selection.getRangeAt(0).cloneRange();
-                const rect = currentSelectionRange.getBoundingClientRect();
-                
-                floatingMenu.style.left = `${rect.left + (rect.width / 2)}px`;
-                
-                // ✨ Fix Menu trùng lặp Mobile: Tính toán vị trí thông minh
-                const isMobile = window.innerWidth < 768;
-                if (isMobile) {
-                    // Trên Mobile: Nằm DƯỚI đoạn chữ để né menu của hệ điều hành
-                    floatingMenu.style.top = `${rect.bottom + window.scrollY + 10}px`;
-                    floatingMenu.classList.add('mobile-pos');
-                } else {
-                    // Trên PC: Nằm TRÊN đoạn chữ
-                    floatingMenu.style.top = `${rect.top + window.scrollY}px`;
-                    floatingMenu.classList.remove('mobile-pos');
-                }
-                
+                currentSelectedText = text; currentSelectionRange = selection.getRangeAt(0).cloneRange();
+                const rect = currentSelectionRange.getBoundingClientRect(); floatingMenu.style.left = `${rect.left + (rect.width / 2)}px`;
+                if (window.innerWidth < 768) { floatingMenu.style.top = `${rect.bottom + window.scrollY + 10}px`; floatingMenu.classList.add('mobile-pos'); } 
+                else { floatingMenu.style.top = `${rect.top + window.scrollY}px`; floatingMenu.classList.remove('mobile-pos'); }
                 floatingMenu.classList.add('active');
-            } else {
-                if(!floatingMenu.contains(document.activeElement)) {
-                    floatingMenu.classList.remove('active');
-                }
-            }
+            } else { if(!floatingMenu.contains(document.activeElement)) floatingMenu.classList.remove('active'); }
         }
-
-        document.addEventListener('mouseup', () => setTimeout(handleSelection, 50));
-        document.addEventListener('touchend', () => setTimeout(handleSelection, 100));
+        document.addEventListener('mouseup', () => setTimeout(handleSelection, 50)); document.addEventListener('touchend', () => setTimeout(handleSelection, 100));
         window.addEventListener('scroll', () => floatingMenu.classList.remove('active'));
 
-        window.toggleBox = function(boxId) {
-            const box = document.getElementById(boxId);
-            if (!box) return;
-            const toggleBtnText = box.querySelector('.toggle-btn-text');
-            if (box.classList.contains('is-collapsed')) {
-                box.classList.remove('is-collapsed');
-                if (toggleBtnText) toggleBtnText.textContent = 'Thu gọn';
-            } else {
-                box.classList.add('is-collapsed');
-                if (toggleBtnText) toggleBtnText.textContent = 'Mở rộng';
-            }
-            autoSave(); // ✨ Cập nhật trạng thái gấp/mở vào DB
-        };
-
-        // ✨ HÀM MỚI: Bật/Tắt chế độ Toàn màn hình (Focus Mode)
-        window.toggleFullScreen = function(boxId, event) {
-            event.stopPropagation(); // Ngăn sự kiện click lan ra ngoài làm thu gọn box
-            const box = document.getElementById(boxId);
-            if (!box) return;
-
-            const isFS = box.classList.toggle('fullscreen-mode');
-            document.body.classList.toggle('has-fullscreen', isFS);
-
-            // ✨ Sửa lỗi đơ (Stacking Context): Gỡ bỏ animation/transform của các hộp cha
-            let parent = box.parentElement;
-            while (parent && parent.closest) {
-                let ancestorBox = parent.closest('.inline-result-box');
-                if (ancestorBox) {
-                    isFS ? ancestorBox.classList.add('stacking-disabled') : ancestorBox.classList.remove('stacking-disabled');
-                    parent = ancestorBox.parentElement;
-                } else {
-                    break;
-                }
-            }
-
-            const iconSvg = document.getElementById(`fs-icon-${boxId}`);
-            if (isFS) {
-                // Đổi icon thành Mũi tên Quay lại (Thu nhỏ)
-                iconSvg.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />`;
-            } else {
-                // Đổi icon thành Phóng to
-                iconSvg.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />`;
-                // Cuộn mượt về lại vị trí của box sau khi thu nhỏ
-                setTimeout(() => box.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
-            }
-        };
+        window.toggleBox = function(boxId) { const box = document.getElementById(boxId); if (!box) return; box.classList.toggle('is-collapsed'); const tBtn = box.querySelector('.toggle-btn-text'); if(tBtn) tBtn.textContent = box.classList.contains('is-collapsed') ? 'Mở rộng' : 'Thu gọn'; autoSave(); };
+        window.toggleFullScreen = function(boxId, event) { event.stopPropagation(); const box = document.getElementById(boxId); if (!box) return; const isFS = box.classList.toggle('fullscreen-mode'); document.body.classList.toggle('has-fullscreen', isFS); let parent = box.parentElement; while (parent && parent.closest) { let aBox = parent.closest('.inline-result-box'); if (aBox) { isFS ? aBox.classList.add('stacking-disabled') : aBox.classList.remove('stacking-disabled'); parent = aBox.parentElement; } else break; } const iconSvg = document.getElementById(`fs-icon-${boxId}`); iconSvg.innerHTML = isFS ? `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />` : `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />`; if(!isFS) setTimeout(() => box.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50); };
 
         window.runTool = async function(toolType) {
-            if (!currentSelectedText || !currentSelectionRange) return;
-            floatingMenu.classList.remove('active');
-
-            let containerNode = currentSelectionRange.endContainer;
-            if (containerNode.nodeType === 3) containerNode = containerNode.parentNode;
+            if (!currentSelectedText || !currentSelectionRange) return; floatingMenu.classList.remove('active');
+            let cNode = currentSelectionRange.endContainer; if (cNode.nodeType === 3) cNode = cNode.parentNode;
+            let bParent = cNode.closest('p, h1, h2, h3, h4, h5, h6, ul, ol, blockquote') || cNode.closest('div');
+            const isNested = bParent.closest('.inline-result-box') !== null; const resultBoxId = 'res-' + Date.now(); const resultBox = document.createElement('div'); resultBox.id = resultBoxId; resultBox.className = `inline-result-box my-6 bg-white border border-slate-200 rounded-2xl shadow-xl relative transition-all ${isNested ? 'nested-result' : ''}`;
             
-            // Tìm block chứa đoạn text (chỉ lấy thẻ văn bản, tránh lấy thẻ div khung)
-            let blockParent = containerNode.closest('p, h1, h2, h3, h4, h5, h6, ul, ol, blockquote');
-            if (!blockParent) blockParent = containerNode.closest('div'); // Fallback
+            resultBox.innerHTML = `<div class="bg-slate-50 border-b border-slate-100 px-4 py-3 flex justify-between items-center cursor-pointer rounded-t-2xl box-header hover:bg-slate-100 transition-colors" onclick="toggleBox('${resultBoxId}')"><span class="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2 box-title"><svg class="w-4 h-4 animate-spin text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>AI Đang phân tích...</span><div class="flex items-center gap-1 md:gap-3"><span class="text-blue-600 font-semibold text-xs toggle-btn-text hidden md:inline">Thu gọn</span><button onclick="toggleFullScreen('${resultBoxId}', event)" class="text-slate-400 hover:text-blue-600 transition-colors p-1.5 rounded hover:bg-slate-200" title="Toàn màn hình / Thu nhỏ"><svg id="fs-icon-${resultBoxId}" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg></button><button onclick="document.getElementById('${resultBoxId}').remove(); window.autoSave(); event.stopPropagation();" class="text-slate-400 hover:text-red-500 transition-colors p-1.5 rounded hover:bg-red-50" title="Xóa kết quả này"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg></button></div></div><div class="p-4 md:p-5 box-content" id="content-${resultBoxId}"><div class="h-4 bg-slate-200 rounded w-3/4 mb-3 animate-pulse"></div><div class="h-4 bg-slate-200 rounded w-full mb-3 animate-pulse"></div><div class="h-4 bg-slate-200 rounded w-5/6 animate-pulse"></div></div>`;
+            if (bParent && bParent.parentNode) bParent.parentNode.insertBefore(resultBox, bParent.nextSibling); else contentArea.appendChild(resultBox); 
+            window.getSelection().removeAllRanges(); setTimeout(() => resultBox.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
 
-            // ✨ LOGIC KIỂM TRA LỒNG GHÉP (Nesting)
-            const isNested = blockParent.closest('.inline-result-box') !== null;
+            let taskPrompt = ""; let iconText = "";
+            if (toolType === 'explain') { iconText = "🔍 Giải thích thuật ngữ"; taskPrompt = "Giải thích khái niệm khó, thuật ngữ trong đoạn văn. Giải thích theo bối cảnh."; } 
+            else if (toolType === 'eli5') { iconText = "💡 Giải thích đơn giản"; taskPrompt = "Viết lại bằng ngôn ngữ đời thường. Đưa ra 1 ví dụ thực tế."; } 
+            else if (toolType === 'critique') { iconText = "⚖️ Phản biện"; taskPrompt = "Chỉ ra điểm yếu lập luận. Đưa ra góc nhìn trái chiều."; } 
+            else if (toolType === 'expand') { iconText = "🌐 Mở rộng"; taskPrompt = "Mở rộng nguyên nhân, bối cảnh lịch sử, liên hệ vĩ mô."; }
 
-            const resultBoxId = 'res-' + Date.now();
-            const resultBox = document.createElement('div');
-            resultBox.id = resultBoxId;
-            // Thêm class nested-result nếu box này nằm trong một box khác
-            resultBox.className = `inline-result-box my-6 bg-white border border-slate-200 rounded-2xl shadow-xl relative transition-all ${isNested ? 'nested-result' : ''}`;
-            
-            resultBox.innerHTML = `
-                <div class="bg-slate-50 border-b border-slate-100 px-4 py-3 flex justify-between items-center cursor-pointer rounded-t-2xl box-header hover:bg-slate-100 transition-colors" onclick="toggleBox('${resultBoxId}')">
-                    <span class="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2 box-title">
-                        <svg class="w-4 h-4 animate-spin text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                        AI Đang phân tích...
-                    </span>
-                    <div class="flex items-center gap-1 md:gap-3">
-                        <span class="text-blue-600 font-semibold text-xs toggle-btn-text hidden md:inline">Thu gọn</span>
-                        
-                        <!-- ✨ Nút Phóng to Toàn màn hình -->
-                        <button onclick="toggleFullScreen('${resultBoxId}', event)" class="text-slate-400 hover:text-blue-600 transition-colors p-1.5 rounded hover:bg-slate-200" title="Toàn màn hình / Thu nhỏ">
-                            <svg id="fs-icon-${resultBoxId}" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-                            </svg>
-                        </button>
-
-                        <button onclick="document.getElementById('${resultBoxId}').remove(); window.autoSave(); event.stopPropagation();" class="text-slate-400 hover:text-red-500 transition-colors p-1.5 rounded hover:bg-red-50" title="Xóa kết quả này">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
-                        </button>
-                    </div>
-                </div>
-                <div class="p-4 md:p-5 box-content" id="content-${resultBoxId}">
-                    <div class="h-4 bg-slate-200 rounded w-3/4 mb-3 animate-pulse"></div>
-                    <div class="h-4 bg-slate-200 rounded w-full mb-3 animate-pulse"></div>
-                    <div class="h-4 bg-slate-200 rounded w-5/6 animate-pulse"></div>
-                </div>
-            `;
-
-            // ✨ Sửa lỗi vị trí: Chèn đúng ngay dưới đoạn được chọn kể cả khi nó nằm cuối
-            if (blockParent && blockParent.parentNode) {
-                blockParent.parentNode.insertBefore(resultBox, blockParent.nextSibling);
-            } else {
-                contentArea.appendChild(resultBox); 
-            }
-
-            window.getSelection().removeAllRanges();
-            setTimeout(() => resultBox.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
-
-            let taskPrompt = "";
-            let iconText = "";
-
-            if (toolType === 'explain') { iconText = "🔍 Giải thích thuật ngữ"; taskPrompt = "Giải thích các khái niệm khó, thuật ngữ, hoặc ý nghĩa hàm ẩn trong đoạn văn được chọn. Bắt buộc giải thích theo đúng bối cảnh của bài viết."; } 
-            else if (toolType === 'eli5') { iconText = "💡 Giải thích đơn giản (ELI5)"; taskPrompt = "Viết lại đoạn văn được chọn bằng ngôn ngữ đời thường, cực kỳ đơn giản dễ hiểu. Đưa ra 1 ví dụ thực tế gần gũi."; } 
-            else if (toolType === 'critique') { iconText = "⚖️ Phản biện đa chiều"; taskPrompt = "Chỉ ra điểm yếu, lỗ hổng trong lập luận của đoạn văn được chọn. Đưa ra góc nhìn trái chiều hoặc những yếu tố tác giả đã bỏ qua."; } 
-            else if (toolType === 'expand') { iconText = "🌐 Mở rộng vấn đề"; taskPrompt = "Mở rộng bối cảnh của đoạn văn được chọn: Cung cấp nguyên nhân sâu xa, bối cảnh lịch sử/khoa học, hoặc liên hệ xu hướng vĩ mô."; }
-
-            const finalPrompt = `Bạn là một trợ lý nghiên cứu chuyên sâu. Hãy thực hiện nhiệm vụ dựa trên các thông tin sau:
-            
-[BỐI CẢNH TOÀN BÀI VIẾT]
-"""
-${globalFormattedText}
-"""
-
-[ĐOẠN VĂN MÀ NGƯỜI DÙNG ĐANG HỎI TỚI]
-"""
-${currentSelectedText}
-"""
-
-[NHIỆM VỤ CỦA BẠN]
-${taskPrompt}
-Viết bằng tiếng Việt, định dạng Markdown rõ ràng, thân thiện.`;
+            const finalPrompt = `[BỐI CẢNH TOÀN BÀI]\n"""${globalFormattedText}"""\n\n[ĐOẠN VĂN]\n"""${currentSelectedText}"""\n\n[NHIỆM VỤ]\n${taskPrompt}\nViết bằng tiếng Việt, định dạng Markdown rõ ràng.`;
 
             try {
-                const result = await model.generateContent(finalPrompt);
-                const aiText = result.response.text();
+                // ✨ Dùng Wrapper
+                const result = await executeAITask('text', finalPrompt);
                 
-                document.getElementById(`content-${resultBoxId}`).innerHTML = `<div class="prose prose-blue max-w-none prose-sm md:prose-base">${marked.parse(aiText)}</div>`;
-                
-                const boxHeader = resultBox.querySelector('.box-header');
-                const titleSpan = boxHeader.querySelector('.box-title');
-                titleSpan.innerHTML = iconText;
-                titleSpan.className = "text-xs font-bold text-blue-700 uppercase tracking-widest flex items-center gap-2 box-title";
-                
-                const footerDiv = document.createElement('div');
-                footerDiv.className = "bg-slate-50/50 border-t border-slate-100 px-4 py-3 flex justify-center items-center rounded-b-2xl box-footer";
-                footerDiv.innerHTML = `
-                    <button onclick="toggleBox('${resultBoxId}')" class="text-slate-600 hover:text-blue-700 bg-white border border-slate-200 shadow-sm transition-colors text-sm font-medium flex items-center gap-1.5 px-4 py-1.5 rounded-full">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" /></svg>
-                        Thu gọn kết quả
-                    </button>
-                `;
-                resultBox.appendChild(footerDiv);
-                
-                autoSave(); // ✨ Lưu lại box AI vừa chèn vào DB
-            } catch (error) {
-                document.getElementById(`content-${resultBoxId}`).innerHTML = `<p class="text-red-600 font-semibold">Lỗi phân tích: ${error.message}</p>`;
-            }
+                document.getElementById(`content-${resultBoxId}`).innerHTML = `<div class="prose prose-blue max-w-none prose-sm md:prose-base">${marked.parse(result.response.text())}</div>`;
+                const titleSpan = resultBox.querySelector('.box-title'); titleSpan.innerHTML = iconText; titleSpan.className = "text-xs font-bold text-blue-700 uppercase tracking-widest flex items-center gap-2 box-title";
+                const footerDiv = document.createElement('div'); footerDiv.className = "bg-slate-50/50 border-t border-slate-100 px-4 py-3 flex justify-center items-center rounded-b-2xl box-footer";
+                footerDiv.innerHTML = `<button onclick="toggleBox('${resultBoxId}')" class="text-slate-600 hover:text-blue-700 bg-white border border-slate-200 shadow-sm transition-colors text-sm font-medium flex items-center gap-1.5 px-4 py-1.5 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" /></svg>Thu gọn kết quả</button>`;
+                resultBox.appendChild(footerDiv); autoSave();
+            } catch (error) { document.getElementById(`content-${resultBoxId}`).innerHTML = `<p class="text-red-600 font-semibold">Lỗi phân tích: ${error.message}</p>`; }
         };
     </script>
 </body>
