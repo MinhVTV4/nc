@@ -158,13 +158,14 @@
         </div>
     </main>
 
-    <!-- Menu Nổi và Khung Chat (Giữ nguyên) -->
-    <div id="floatingMenu" class="bg-slate-800 text-white rounded-lg shadow-2xl flex p-1 menu-arrow ring-1 ring-white/10">
+    <!-- Menu Nổi và Khung Chat (Cập nhật Menu Nổi scroll ngang trên mobile để chứa đủ 6 nút) -->
+    <div id="floatingMenu" class="bg-slate-800 text-white rounded-lg shadow-2xl flex p-1 menu-arrow ring-1 ring-white/10 overflow-x-auto max-w-[95vw] whitespace-nowrap">
         <button onclick="runTool('explain')" class="flex items-center gap-1.5 px-3 py-2 hover:bg-slate-700 rounded-md transition-colors text-sm font-medium border-r border-slate-600"><span class="text-blue-400">🔍</span> Giải thích</button>
-        <button onclick="runTool('eli5')" class="flex items-center gap-1.5 px-3 py-2 hover:bg-slate-700 rounded-md transition-colors text-sm font-medium border-r border-slate-600"><span class="text-green-400">💡</span> Dễ hiểu</button>
-        <button onclick="runTool('critique')" class="flex items-center gap-1.5 px-3 py-2 hover:bg-slate-700 rounded-md transition-colors text-sm font-medium border-r border-slate-600"><span class="text-purple-400">⚖️</span> Phản biện</button>
-        <button onclick="runTool('expand')" class="flex items-center gap-1.5 px-3 py-2 hover:bg-slate-700 rounded-md transition-colors text-sm font-medium"><span class="text-orange-400">🌐</span> Mở rộng</button>
-        <button onclick="quoteToChat()" class="flex items-center gap-1.5 px-3 py-2 hover:bg-slate-700 rounded-md transition-colors text-sm font-medium border-l border-slate-600 text-blue-300"><span>💬</span> Hỏi AI</button>
+        <button onclick="runTool('eli5')" class="flex items-center gap-1.5 px-3 py-2 hover:bg-slate-700 rounded-md transition-colors text-sm font-medium border-r border-slate-600"><span class="text-emerald-400">💡</span> Dễ hiểu</button>
+        <button onclick="runTool('critique')" class="flex items-center gap-1.5 px-3 py-2 hover:bg-slate-700 rounded-md transition-colors text-sm font-medium border-r border-slate-600"><span class="text-rose-400">⚖️</span> Phản biện</button>
+        <button onclick="runTool('solution')" class="flex items-center gap-1.5 px-3 py-2 hover:bg-slate-700 rounded-md transition-colors text-sm font-medium border-r border-slate-600"><span class="text-indigo-400">🛠️</span> Giải pháp</button>
+        <button onclick="runTool('expand')" class="flex items-center gap-1.5 px-3 py-2 hover:bg-slate-700 rounded-md transition-colors text-sm font-medium border-r border-slate-600"><span class="text-amber-400">🌐</span> Mở rộng</button>
+        <button onclick="quoteToChat()" class="flex items-center gap-1.5 px-3 py-2 hover:bg-slate-700 rounded-md transition-colors text-sm font-medium text-blue-300"><span>💬</span> Hỏi AI</button>
     </div>
 
     <div id="chatDrawer" class="fixed inset-y-0 right-0 w-full md:w-[400px] bg-white shadow-2xl border-l border-slate-200 z-50 transform translate-x-full transition-transform duration-300 flex flex-col pt-16 md:pt-0">
@@ -789,31 +790,43 @@
         window.toggleFullScreen = function(boxId, event) { event.stopPropagation(); const box = document.getElementById(boxId); if (!box) return; const isFS = box.classList.toggle('fullscreen-mode'); document.body.classList.toggle('has-fullscreen', isFS); let parent = box.parentElement; while (parent && parent.closest) { let aBox = parent.closest('.inline-result-box'); if (aBox) { isFS ? aBox.classList.add('stacking-disabled') : aBox.classList.remove('stacking-disabled'); parent = aBox.parentElement; } else break; } const iconSvg = document.getElementById(`fs-icon-${boxId}`); iconSvg.innerHTML = isFS ? `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />` : `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />`; if(!isFS) setTimeout(() => box.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50); };
 
         window.runTool = async function(toolType) {
-            if (!currentSelectedText || !currentSelectionRange) return; floatingMenu.classList.remove('active');
+            if (!currentSelectedText || !currentSelectionRange || !model) return;
+            floatingMenu.classList.remove('active');
+
             let cNode = currentSelectionRange.endContainer; if (cNode.nodeType === 3) cNode = cNode.parentNode;
             let bParent = cNode.closest('p, h1, h2, h3, h4, h5, h6, ul, ol, blockquote') || cNode.closest('div');
-            const isNested = bParent.closest('.inline-result-box') !== null; const resultBoxId = 'res-' + Date.now(); const resultBox = document.createElement('div'); resultBox.id = resultBoxId; resultBox.className = `inline-result-box my-6 bg-white border border-slate-200 rounded-2xl shadow-xl relative transition-all ${isNested ? 'nested-result' : ''}`;
+            const isNested = bParent.closest('.inline-result-box') !== null; 
             
-            resultBox.innerHTML = `<div class="bg-slate-50 border-b border-slate-100 px-4 py-3 flex justify-between items-center cursor-pointer rounded-t-2xl box-header hover:bg-slate-100 transition-colors" onclick="toggleBox('${resultBoxId}')"><span class="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2 box-title"><svg class="w-4 h-4 animate-spin text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>AI Đang phân tích...</span><div class="flex items-center gap-1 md:gap-3"><span class="text-blue-600 font-semibold text-xs toggle-btn-text hidden md:inline">Thu gọn</span><button onclick="toggleFullScreen('${resultBoxId}', event)" class="text-slate-400 hover:text-blue-600 transition-colors p-1.5 rounded hover:bg-slate-200" title="Toàn màn hình / Thu nhỏ"><svg id="fs-icon-${resultBoxId}" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg></button><button onclick="document.getElementById('${resultBoxId}').remove(); window.autoSave(); event.stopPropagation();" class="text-slate-400 hover:text-red-500 transition-colors p-1.5 rounded hover:bg-red-50" title="Xóa kết quả này"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg></button></div></div><div class="p-4 md:p-5 box-content" id="content-${resultBoxId}"><div class="h-4 bg-slate-200 rounded w-3/4 mb-3 animate-pulse"></div><div class="h-4 bg-slate-200 rounded w-full mb-3 animate-pulse"></div><div class="h-4 bg-slate-200 rounded w-5/6 animate-pulse"></div></div>`;
+            // ✨ CẤU HÌNH MÀU SẮC NGỮ NGHĨA VÀ PROMPT
+            const themes = {
+                'explain': { icon: "🔍", title: "Giải thích thuật ngữ", prompt: "Giải thích khái niệm khó, thuật ngữ trong đoạn văn. Giải thích theo bối cảnh.", boxClass: "bg-blue-50/50 border-blue-200 border-l-4 border-l-blue-500", titleClass: "text-blue-800", btnClass: "text-blue-700 bg-white hover:bg-blue-100 border-blue-200" },
+                'eli5': { icon: "💡", title: "Giải thích đơn giản", prompt: "Viết lại bằng ngôn ngữ đời thường. Đưa ra 1 ví dụ thực tế.", boxClass: "bg-emerald-50/50 border-emerald-200 border-l-4 border-l-emerald-500", titleClass: "text-emerald-800", btnClass: "text-emerald-700 bg-white hover:bg-emerald-100 border-emerald-200" },
+                'critique': { icon: "⚖️", title: "Phản biện đa chiều", prompt: "Chỉ ra điểm yếu, lỗ hổng lập luận. Đưa ra góc nhìn trái chiều.", boxClass: "bg-rose-50/50 border-rose-200 border-l-4 border-l-rose-500", titleClass: "text-rose-800", btnClass: "text-rose-700 bg-white hover:bg-rose-100 border-rose-200" },
+                'solution': { icon: "🛠️", title: "Đề xuất giải pháp", prompt: "Dựa vào vấn đề hoặc điểm yếu được nêu trong đoạn văn, hãy đề xuất các giải pháp khả thi, thực tế và đột phá để khắc phục.", boxClass: "bg-indigo-50/50 border-indigo-200 border-l-4 border-l-indigo-500", titleClass: "text-indigo-800", btnClass: "text-indigo-700 bg-white hover:bg-indigo-100 border-indigo-200" },
+                'expand': { icon: "🌐", title: "Mở rộng vấn đề", prompt: "Mở rộng nguyên nhân, bối cảnh lịch sử, liên hệ vĩ mô.", boxClass: "bg-amber-50/50 border-amber-200 border-l-4 border-l-amber-500", titleClass: "text-amber-800", btnClass: "text-amber-700 bg-white hover:bg-amber-100 border-amber-200" }
+            };
+            const theme = themes[toolType];
+
+            const resultBoxId = 'res-' + Date.now(); const resultBox = document.createElement('div'); resultBox.id = resultBoxId; 
+            // Áp dụng boxClass động
+            resultBox.className = `inline-result-box my-6 border rounded-2xl shadow-sm relative transition-all ${isNested ? 'nested-result' : ''} ${theme.boxClass}`;
+            
+            // Xóa bg-slate-50 ở header và footer, thay bằng nền trong suốt để ăn theo nền của theme
+            resultBox.innerHTML = `<div class="border-b border-white/40 px-4 py-3 flex justify-between items-center cursor-pointer rounded-t-2xl box-header hover:bg-white/20 transition-colors" onclick="toggleBox('${resultBoxId}')"><span class="text-xs font-bold uppercase tracking-widest flex items-center gap-2 box-title ${theme.titleClass}"><svg class="w-4 h-4 animate-spin opacity-70" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>AI Đang phân tích...</span><div class="flex items-center gap-1 md:gap-3"><span class="${theme.titleClass} font-semibold text-xs toggle-btn-text hidden md:inline">Thu gọn</span><button onclick="toggleFullScreen('${resultBoxId}', event)" class="text-slate-500 hover:text-slate-800 transition-colors p-1.5 rounded hover:bg-white/50" title="Toàn màn hình / Thu nhỏ"><svg id="fs-icon-${resultBoxId}" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg></button><button onclick="document.getElementById('${resultBoxId}').remove(); window.autoSave(); event.stopPropagation();" class="text-slate-500 hover:text-red-500 transition-colors p-1.5 rounded hover:bg-white/50" title="Xóa kết quả này"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg></button></div></div><div class="p-4 md:p-5 box-content" id="content-${resultBoxId}"><div class="h-4 bg-white/60 rounded w-3/4 mb-3 animate-pulse"></div><div class="h-4 bg-white/60 rounded w-full mb-3 animate-pulse"></div><div class="h-4 bg-white/60 rounded w-5/6 animate-pulse"></div></div>`;
             if (bParent && bParent.parentNode) bParent.parentNode.insertBefore(resultBox, bParent.nextSibling); else contentArea.appendChild(resultBox); 
             window.getSelection().removeAllRanges(); setTimeout(() => resultBox.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
 
-            let taskPrompt = ""; let iconText = "";
-            if (toolType === 'explain') { iconText = "🔍 Giải thích thuật ngữ"; taskPrompt = "Giải thích khái niệm khó, thuật ngữ trong đoạn văn. Giải thích theo bối cảnh."; } 
-            else if (toolType === 'eli5') { iconText = "💡 Giải thích đơn giản"; taskPrompt = "Viết lại bằng ngôn ngữ đời thường. Đưa ra 1 ví dụ thực tế."; } 
-            else if (toolType === 'critique') { iconText = "⚖️ Phản biện"; taskPrompt = "Chỉ ra điểm yếu lập luận. Đưa ra góc nhìn trái chiều."; } 
-            else if (toolType === 'expand') { iconText = "🌐 Mở rộng"; taskPrompt = "Mở rộng nguyên nhân, bối cảnh lịch sử, liên hệ vĩ mô."; }
-
-            const finalPrompt = `[BỐI CẢNH TOÀN BÀI]\n"""${globalFormattedText}"""\n\n[ĐOẠN VĂN]\n"""${currentSelectedText}"""\n\n[NHIỆM VỤ]\n${taskPrompt}\nViết bằng tiếng Việt, định dạng Markdown rõ ràng.`;
+            const finalPrompt = `[BỐI CẢNH TOÀN BÀI]\n"""${globalFormattedText}"""\n\n[ĐOẠN VĂN]\n"""${currentSelectedText}"""\n\n[NHIỆM VỤ]\n${theme.prompt}\nViết bằng tiếng Việt, định dạng Markdown rõ ràng.`;
 
             try {
-                // ✨ Dùng Wrapper
                 const result = await executeAITask('text', finalPrompt);
                 
                 document.getElementById(`content-${resultBoxId}`).innerHTML = `<div class="prose prose-blue max-w-none prose-sm md:prose-base">${marked.parse(result.response.text())}</div>`;
-                const titleSpan = resultBox.querySelector('.box-title'); titleSpan.innerHTML = iconText; titleSpan.className = "text-xs font-bold text-blue-700 uppercase tracking-widest flex items-center gap-2 box-title";
-                const footerDiv = document.createElement('div'); footerDiv.className = "bg-slate-50/50 border-t border-slate-100 px-4 py-3 flex justify-center items-center rounded-b-2xl box-footer";
-                footerDiv.innerHTML = `<button onclick="toggleBox('${resultBoxId}')" class="text-slate-600 hover:text-blue-700 bg-white border border-slate-200 shadow-sm transition-colors text-sm font-medium flex items-center gap-1.5 px-4 py-1.5 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" /></svg>Thu gọn kết quả</button>`;
+                const titleSpan = resultBox.querySelector('.box-title'); 
+                titleSpan.innerHTML = theme.icon + ' ' + theme.title; 
+                
+                const footerDiv = document.createElement('div'); footerDiv.className = "border-t border-white/40 px-4 py-3 flex justify-center items-center rounded-b-2xl box-footer";
+                footerDiv.innerHTML = `<button onclick="toggleBox('${resultBoxId}')" class="${theme.btnClass} border shadow-sm transition-colors text-sm font-medium flex items-center gap-1.5 px-4 py-1.5 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" /></svg>Thu gọn kết quả</button>`;
                 resultBox.appendChild(footerDiv); autoSave();
             } catch (error) { document.getElementById(`content-${resultBoxId}`).innerHTML = `<p class="text-red-600 font-semibold">Lỗi phân tích: ${error.message}</p>`; }
         };
